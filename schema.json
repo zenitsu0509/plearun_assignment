@@ -1,0 +1,4 @@
+{"type":"object","required":["selected_row_ids","quote","reason"],
+ "properties":{"selected_row_ids":{"type":"array","items":{"type":"string"}},
+   "quote":{"type":["string","null"]},"reason":{"type":"string","maxLength":280}},
+ "additionalProperties":false}

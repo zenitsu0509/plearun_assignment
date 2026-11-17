@@ -1,0 +1,37 @@
+{
+  "findings": [
+    {
+      "claim": "Incident 2026-03-02, Route 21 corridor.",
+      "finding": "not_checkable"
+    },
+    {
+      "claim": "Officer Lee first observed the blue sedan at about 21:14 near mile marker 4",
+      "finding": "not_settled"
+    },
+    {
+      "claim": "travelling 58 mph in a posted 45 zone.",
+      "finding": "match",
+      "cite": {
+        "file": "camera_log.csv",
+        "row": 15
+      },
+      "quote": "1772503638000,CAM-07,58,45"
+    },
+    {
+      "claim": "The driver pulled into the Harbor Gas lot and stopped around 21:16.",
+      "finding": "not_settled"
+    },
+    {
+      "claim": "A 911 call reporting the incident was logged at 21:11.",
+      "finding": "not_settled"
+    },
+    {
+      "claim": "Dispatch records show a unit on scene roughly 2 minutes after the stop.",
+      "finding": "not_settled"
+    },
+    {
+      "claim": "Officer Lee states the vehicle was the only car in the lane.",
+      "finding": "not_checkable"
+    }
+  ]
+}

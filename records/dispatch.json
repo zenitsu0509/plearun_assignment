@@ -1,0 +1,25 @@
+{
+  "export": {
+    "system": "CAD-SYNTH",
+    "version": "3.1",
+    "events": [
+      {
+        "id": "D-1001",
+        "type": "911_call",
+        "logged": "2026-03-02 21:10:19"
+      },
+      {
+        "id": "D-1002",
+        "type": "unit_on_scene",
+        "logged": "2026-03-02T21:17:19-05:00",
+        "unit": "L-12"
+      },
+      {
+        "id": "D-1003",
+        "type": "unit_dispatched",
+        "logged": 1772504040000,
+        "unit": "L-12"
+      }
+    ]
+  }
+}
