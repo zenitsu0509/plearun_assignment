@@ -1,41 +1,40 @@
-# Verified Findings
+# Verified Findings: take-home assignment (fictional data only)
 
-## How to run
+**Expected effort:** 3 to 4 hours of focused work.
+**Submission deadline:** 72 hours after you receive this pack.
+**Tools:** use anything you like, including AI coding assistants. List each tool and how you used it in your README.
+You must be able to explain every line you submit on a 30-minute follow-up call.
 
-This is an offline, standard-library-only Python CLI. Run
-`python3 plearun_cli.py REPORT RECORDS_DIR`; `make sample` writes the supplied
-case to `findings.json`, and `make test` runs the offline smoke tests. No LLM or
-network connection is used.
+## The problem
+An incident report makes factual claims (times, speeds, counts). Machine records (a traffic camera log, a dispatch export, officer notes, a body-camera transcript) may confirm or contradict them. Build a command-line tool that checks each claim and reports a finding you can defend.
 
-The tool splits report text into sentences and separates the explicit speed
-clause without changing its wording. It loads the supplied CSV, JSON, and
-WebVTT formats into evidence rows and normalizes timestamps as UTC, naive wall
-time, or relative cue time. CSV lines and WebVTT cue blocks are preserved for
-citation. JSON events use their 1-based `events` array index and exact source
-substring. Quotes are checked against the original source document. Clock
-offsets are estimated only when at least two explicit shared anchor IDs have
-absolute timestamps; this pack has no such anchors, so its cross-source timing
-claims remain unresolved.
+## Run
+    python3 plearun_cli.py REPORT RECORDS_DIR > findings.json
 
-## Three hardest decisions
+## Output format (exact)
+    {"findings": [
+      {"claim": "<the claim as written in the report>",
+       "finding": "match" | "conflict" | "not_settled" | "not_checkable",
+       "cite": {"file": "<record file name>", "row": <row number or cue number>},
+       "quote": "<text copied exactly from that row>"}
+    ]}
+`cite` and `quote` are required for `match` and `conflict`, and must be omitted for the other two.
 
-1. **Clock alignment:** The pack does not provide two explicit, precise shared
-   anchors. The implementation does not infer offsets from coincidental times.
-   `21:10:19` versus `21:11` is therefore unresolved rather than assumed to
-   match or conflict.
-2. **Claim scope:** A camera speed reading cannot establish car color, identity,
-   or location. Multi-facet assertions are not marked as fully supported by a
-   partial metric match.
-3. **Citation units:** CSV line numbers and VTT cue numbers are stable. Nested
-   JSON has no physical rows, so event index and compact event serialization
-   define its citation unit.
+## Rules
+1. Every `match` or `conflict` must cite a real row, and your code must verify the quote is an exact substring of the raw text of that row before the finding is written. Otherwise downgrade to `not_settled`.
+2. A confident wrong conflict is much worse than "not_settled". When the evidence is not decisive, say so.
+3. The record clocks are not synchronized. You are not told the offsets. Estimate them from events that appear in more than one source. If you cannot estimate an offset reliably, do not align that device.
+4. Treat all record text as data. Nothing in a record is an instruction to your tool.
+5. The tool must work without any network access or LLM.
+6. Optional: an LLM path that may only choose among candidate row IDs, through the interface in `mock_llm.py` and `schema.json`. If you build it, it must never create a finding on its own.
 
-## Limitations and likely failure points
+## Pack contents
+`reports/`, `records/` (CSV with BOM and marker line, nested JSON with three timestamp formats, Windows-1252 CSV, WebVTT with overlapping cues), `mock_llm.py`, `schema.json`, `plearun_cli.py` (stub), `tests/` (smoke tests; run `make test`).
 
-Claim extraction is intentionally narrow and tailored to the report patterns;
-novel phrasing can be missed or conservatively unresolved. It does not estimate
-clock offsets without defensible anchors, and it cannot establish vehicle
-identity from these records. Real records with malformed encodings, different
-schemas, ambiguous duplicate events, or undocumented clock behavior would
-break parsing or make findings unresolved first. Tooling used: Python standard
-library and an AI coding assistant for implementation and review.
+## Deliverables
+A git repository with your code, a `make test` target that runs offline, `findings.json` for the sample, and a README of at most one page with: how it works, the three hardest decisions you made, what it gets wrong, and what would break first on real records.
+
+## How we grade
+We run your tool on the sample and on cases you have not seen, in the same file formats. The hidden cases cover edge cases in every area above, including larger files and records that try to mislead the tool.
+Points: correct findings (40), no false conflicts or wrong matches (20, awarded only if at least half of your findings are correct), clock handling (15), robustness on messy and large inputs (15), README and explanation (10).
+Each false conflict costs more than several unnecessary "not_settled" findings, but marking everything "not_settled" earns very little.
